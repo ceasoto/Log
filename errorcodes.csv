@@ -1,0 +1,109 @@
+ErrorCode;Description
+0x100001;Terminal touch screen touch fault
+0x100002;Terminal touch screen light sensor fault
+0x100003;Sensor communication fault
+0x100004;Update failed
+0x100005;Card reader Offline
+0x100006;Fail to reset
+0x100007;Insulation warning
+0x100008;Weak wireless signal
+0x100009;Terminal SD card fault
+0x10000A;Terminal input surge protection alarm
+0x10000B;Small fan fault report alarm
+0x10000C;SECC socket connection warning
+0x10000D;SECC Update failed
+0x10000F;Environment detection board offline
+0x100010;Self Check Processing
+0x100011;Self Check Fail
+0x100012;Communication failure of top light belt
+0x100013;The force sensor of the electric cable receiver is faulty
+0x100014;The switch signal of the electric cable receiver is lost
+0x100015;The servo driver of the electric cable receiver is faulty
+0x100016;The winding resistance of the electric cable collector is too large
+0x100017;The communication of the electric cable receiver is faulty
+0x100101;Over-temperature fault inside the terminal
+0x100102;Cable joint over-temperature alarm
+0x100103;Cable joint temperature difference alarm
+0x100104;High atmospheric pressure warning
+0x100201;Expiration of product trial period
+0x100202;Terminal emergency stop is pressed
+0x100203;Auxiliary power control fault
+0x100204;PLC communication timeout
+0x100205;Gun lock control fault
+0x100206;Ground Fault
+0x100207;Insulation board fault (communication, hardware)
+0x100208;Output relay control fault
+0x100209;Discharge resistance fault
+0x10020A;Insulation fault
+0x10020B;Terminal liquid level alarm
+0x10020C;Terminal door open
+0x10020D;High humidity alarm
+0x10020E;Impact warning
+0x10020F;Meter fault (communication, data error)
+0x100210;Communication fault with the subboard
+0x100211;Power loss fault
+0x100212;Communication fault with the power cabinet
+0x100213;Over-current fault
+0x100214;Output over-voltage
+0x100215;RCD warm/fault
+0x100216;PLC board offline
+0x100217;Communication fault with the AC-subboard
+0x100219;Communication fault with EV Car
+0x10021A;Communication fault with A7-Board
+0x10021B;Get EV message timeout
+0x10021C;Breaker off
+0x10021D;Response to PLC board timeout
+0x10021E;Discharger timeout
+0x10021F;Precharge timeout
+0x100220;Gun disconnection
+0x100221;Terminal fuse alarm
+0x100222;Gun unavailable
+0x100223;Over-temperature fault inside the terminal
+0x100224;The end of the liquid cooled gun is too warm
+0x100225;Open circuit of fuse
+0x200001;Power module communication fault
+0x200002;Power module fault
+0x200003;PDU relay control fault
+0x200004;PDU communication fault
+0x200005;Power cabinet touch screen touch fault
+0x200006;Power cabinet touch screen light sensor fault
+0x200007;Power cabinet SD card fault
+0x200008;Input surge protection alarm
+0x200009;AC meter fault (communication, data error)
+0x20000A;Communication fault with terminal
+0x200101;Power module over-temperature fault
+0x200102;PDU over-temperature fault
+0x200103;Power control fan communication fault
+0x200104;Power control fan fault (alarm)
+0x200105;Power cabinet over-temperature alarm
+0x200201;Power control output fault
+0x200202;Power cabinet emergency stop is pressed
+0x200203;Power cabinet liquid level alarm
+0x200204;Power cabinet door open
+0x200205;Output short circuit
+0x200206;Input over-voltage fault
+0x200207;Input relay control fault
+0x200208;Input under-voltage fault
+0x200209;Circuit breaker is disconnected
+0x20020B;Impact warning
+0x20020C;Fusing Warning
+0x20020D;Smoke Warning
+0x300101;HPC-cooler over-temperature warning
+0x300102;HPC-cooler liquid level warning
+0x300103;HPC-cooler low liquid temperature warning
+0x300104;HPC-cooler over temperature fault
+0x300105;HPC-cooler liquid level fault
+0x300106;HPC-cooler low liquid temperature fault
+0x300107;HPC-cooler mainboard offline
+0x300108;HPC-cooler liquid pump outlet pressure warning
+0x300109;HPC-cooler fan failure
+0x30010A;HPC-cooler temperature sensor failure
+0x30010B;HPC-cooler pressure sensor failure
+0x30010C;HPC-cooler 24V overvoltage
+0x30010D;HPC-cooler 24V undervoltage
+0x30010E;HPC-cooler pump failure
+0x300201;HPC-cooler fault
+0x300202;HPC-cooler door open
+0x300203;HPC-cooler pipe jam
+0x300204;HPC-cooler pump failure
+0x300205;HPC-cooler liquid shortage alarm

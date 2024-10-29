@@ -30,7 +30,25 @@ def analyze_communication_loss(file_content):
             disconnection_start = None
 
     return pd.DataFrame(connection_periods)
+# Función para extraer el valor de `chgRoutine` de una línea si está presente
+def extract_chg_routine(line):
+    match = re.search(r'chgRoutine\s*=\s*(\d+)', line)
+    if match:
+        return int(match.group(1))
+    return None
+# Función para extraer el valor de `DC_Status`
+def extract_dc_status(line):
+    match = re.search(r'DC_Status\s*=\s*(\d+)', line)
+    if match:
+        return int(match.group(1))
+    return None
 
+# Función para extraer el valor de `stopReason`
+def extract_stop_reason(line):
+    match = re.search(r'stopReason\s*=\s*(\d+)', line)
+    if match:
+        return int(match.group(1))
+    return None
 # Función para analizar comandos de recarga remota y sus respuestas
 def analyze_remote_commands(file_content):
     remote_command_periods = []
@@ -113,39 +131,72 @@ def extract_stop_count(line):
     if match:
         return int(match.group(1))
     return None
+# Función para extraer el valor de `DC_Status`
+def extract_dc_status(line):
+    match = re.search(r'DC_Status\s*=\s*(\d+)', line)
+    if match:
+        return int(match.group(1))
+    return None
 
-# Función para encontrar el inicio y fin de cada transacción basado en `transactionId`
+# Función para extraer el valor de `stopReason`
+def extract_stop_reason(line):
+    match = re.search(r'stopReason\s*=\s*(\d+)', line)
+    if match:
+        return int(match.group(1))
+    return None
+# Función para encontrar el inicio y fin de cada transacción basado en `transactionId` y capturar `chgRoutine`
 def find_transaction_start_end(file_content):
     transaction_pattern = r'"transactionId": (\d+)'
     transaction_events = {}
 
+    # Primer recorrido para registrar el inicio, fin, Start_count y Stop_count de cada transacción
     for line in file_content:
         transaction_match = re.search(transaction_pattern, line)
         if transaction_match:
             transaction_id = transaction_match.group(1)
             timestamp = extract_timestamp(line)
 
-            # Extraer el valor inicial `Start_count`
+            # Extraer valores iniciales y finales
             start_count = extract_start_count(line)
-            # Extraer el valor final `Stop_count`
             stop_count = extract_stop_count(line)
 
-            # Si el ID ya está en el diccionario, actualizar el tiempo de fin y el `Stop_count`
             if transaction_id in transaction_events:
+                # Actualizar el tiempo de fin y el Stop_count si ya existe la transacción
                 if timestamp:
                     transaction_events[transaction_id]["end_time"] = timestamp
                 if stop_count is not None:
                     transaction_events[transaction_id]["stop_count"] = stop_count
             else:
-                # Almacenar el inicio, el fin, `Start_count` y `Stop_count` si es la primera aparición
+                # Guardar inicio, fin, Start_count, Stop_count y listas para chgRoutine, DC_Status y stopReason
                 transaction_events[transaction_id] = {
-                    "start_time": timestamp, 
-                    "end_time": timestamp, 
-                    "start_count": start_count, 
-                    "stop_count": stop_count
+                    "start_time": timestamp,
+                    "end_time": timestamp,
+                    "start_count": start_count,
+                    "stop_count": stop_count,
+                    "chg_routines": [],
+                    "dc_status_values": [],
+                    "stop_reasons": []
                 }
 
-    # Crear una lista para almacenar el resumen de las transacciones
+    # Segundo recorrido para buscar `chgRoutine`, `DC_Status`, y `stopReason` dentro del tiempo de cada transacción
+    for line in file_content:
+        timestamp = extract_timestamp(line)
+        chg_routine = extract_chg_routine(line)
+        dc_status = extract_dc_status(line)
+        stop_reason = extract_stop_reason(line)
+
+        if timestamp:
+            for trans_id, data in transaction_events.items():
+                # Verificar si el timestamp está en el rango de la transacción
+                if data["start_time"] <= timestamp <= data["end_time"]:
+                    if chg_routine is not None:
+                        data["chg_routines"].append(chg_routine)
+                    if dc_status is not None:
+                        data["dc_status_values"].append(dc_status)
+                    if stop_reason is not None:
+                        data["stop_reasons"].append(stop_reason)
+
+    # Crear un DataFrame con el resumen de las transacciones
     transaction_summary = []
     for trans_id, data in transaction_events.items():
         # Calcular la duración si las marcas de tiempo están disponibles
@@ -167,12 +218,16 @@ def find_transaction_start_end(file_content):
             "Start_count": data["start_count"],
             "Stop_count": data["stop_count"],
             "Energy_Wh": energy_wh,
-            "Revisar": revisar
+            "Revisar": revisar,
+            "chgRoutine Values": data["chg_routines"],
+            "DC_Status Values": data["dc_status_values"],
+            "stopReason Values": data["stop_reasons"]
         })
 
     # Crear DataFrame
     df = pd.DataFrame(transaction_summary)
     return df
+
 
 # Configuración de la página
 st.title("Análisis de Logs de Sesiones de Carga (OCPP)")

@@ -229,6 +229,56 @@ def find_transaction_start_end(file_content):
     return df
 
 
+# Cargar el archivo CSV con significados de códigos de error
+error_codes_df = pd.read_csv("errorcodes.csv",sep=";")
+error_codes_df["ErrorCode"] = error_codes_df["ErrorCode"].str.lower()
+
+# Función para extraer timestamp de cada línea
+def extract_timestamp(line):
+    match = re.search(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}\+\d{4}", line)
+    if match:
+        return datetime.strptime(match.group(), "%Y-%m-%dT%H:%M:%S.%f+0000")
+    return None
+
+# Función para extraer `vendorErrorCode`
+def extract_vendor_error_code(line):
+    match = re.search(r'"vendorErrorCode":\s*"([^"]+)"', line)
+    if match:
+        return match.group(1).lower() 
+    return None
+
+# Función para analizar vendorErrorCodes y agregar significados de errores desde el CSV
+def analyze_vendor_error_codes(file_content):
+    error_logs = []
+
+    # Recorrer el archivo y extraer vendorErrorCode y timestamps
+    for line in file_content:
+        timestamp = extract_timestamp(line)
+        vendor_error_code = extract_vendor_error_code(line)
+
+        if vendor_error_code is not None and timestamp:
+            error_logs.append({
+                "Timestamp": timestamp,
+                "vendorErrorCode": vendor_error_code
+            })
+
+    # Convertir los logs de error a un DataFrame
+    error_logs_df = pd.DataFrame(error_logs)
+
+    # Realizar un merge con el archivo CSV que contiene los significados
+    merged_df = error_logs_df.merge(
+        error_codes_df, left_on="vendorErrorCode", right_on="ErrorCode", how="left"
+    )
+
+    # Seleccionar y renombrar columnas
+    merged_df = merged_df[["Timestamp", "vendorErrorCode", "Description"]]
+    merged_df.columns = ["Fecha y Hora", "Código de Error", "Significado del Error"]
+
+    return merged_df
+
+
+
+
 # Configuración de la página
 st.title("Análisis de Logs de Sesiones de Carga (OCPP)")
 st.write("Cargue un archivo de log para procesarlo y analizar la información de las sesiones de carga.")
@@ -261,9 +311,16 @@ if archivo_log is not None:
     transaction_start_end_df = find_transaction_start_end(file_content)
     st.dataframe(transaction_start_end_df)
 
+    # Análisis de códigos de error de vendor y agregación de significados
+    vendor_error_analysis_df = analyze_vendor_error_codes(file_content)
+    st.header("Análisis de Códigos de Error de Vendor")
+    st.dataframe(vendor_error_analysis_df)
+
+
+
     # Opcional: Descarga de resultados
     st.subheader("Descargar Resultados")
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4,col5 = st.columns(5)
     with col1:
         csv1 = communication_loss_df.to_csv(index=False).encode('utf-8')
         st.download_button("Descargar Pérdida de Comunicación", csv1, "communication_loss_periods.csv", "text/csv")
@@ -276,3 +333,7 @@ if archivo_log is not None:
     with col4:
         csv4 = transaction_start_end_df.to_csv(index=False).encode('utf-8')
         st.download_button("Descargar Transacciones", csv4, "transaction_start_end_analysis_with_energy.csv", "text/csv")
+    with col5:
+            # Opción para descargar el análisis en un archivo CSV
+        csv4 = vendor_error_analysis_df.to_csv(index=False).encode('utf-8')
+        st.download_button("Descargar Análisis de Códigos de Error de Vendor", csv4, "vendor_error_analysis.csv", "text/csv")
